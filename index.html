@@ -1,11 +1,18 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Life Rhythm｜5活動推薦デモ</title><style>
-:root{font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;color:#182d41;background:#f3f7fb}*{box-sizing:border-box}body{margin:0}main{max-width:970px;margin:32px auto;padding:0 18px}h1{font-size:29px;margin:0 0 7px}p{line-height:1.65}.muted{color:#64748b}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #e0e8f0;border-radius:15px;padding:20px;margin:16px 0;box-shadow:0 5px 20px #18324b09}label{display:block;font-weight:650;margin:12px 0 6px}select,input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:white}button{background:#1660b6;color:white;border:0;border-radius:9px;padding:13px 24px;font-weight:700;font-size:16px;cursor:pointer;margin-top:17px}button:hover{background:#0e4c95}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:11px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#edf4fc}.pill{display:inline-block;border-radius:6px;background:#e8f1fd;padding:4px 8px;margin:2px;font-size:13px}.score{font-weight:700;color:#1660b6}.small{font-size:13px}.timeline{border-left:3px solid #2c76c6;margin-left:9px;padding-left:20px}.event{margin:15px 0;position:relative}.event:before{content:"";position:absolute;left:-28px;top:5px;background:#2c76c6;width:13px;height:13px;border-radius:50%}@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:23px}} </style></head>
-<body><main><h1>Life Rhythm｜5活動 推薦デモ</h1><p class="muted">検証版 v3｜内容ベースで休憩候補を評価し、時間・順番を別途最適化</p>
-<div class="grid"><section class="panel"><h2>ユーザー設定</h2><label for="who">利用者</label><select id="who"><option value="A">A：課題を先に済ませたい</option><option value="B">B：入浴後に課題を進めたい</option></select><label for="start">予定開始時刻</label><select id="start"><option value="17">17:00</option><option value="18" selected>18:00</option><option value="19">19:00</option></select><label for="load">希望する活動の負荷（0～10）</label><input id="load" type="range" min="0" max="10" value="3"><div class="small muted">現在値：<span id="loadValue">3</span></div><label for="recovery">希望する活動の回復度（0～10）</label><input id="recovery" type="range" min="0" max="10" value="7"><div class="small muted">現在値：<span id="recoveryValue">7</span></div><label for="gap">夕食後、入浴までの希望間隔</label><select id="gap"><option value="0">指定しない</option><option value="20" selected>20分以上（試作用の希望）</option><option value="40">40分以上（試作用の希望）</option></select><button id="run">推薦を計算</button></section>
+<title>Life Rhythm｜5活動推薦デモ v4</title><style>
+:root{font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;color:#182d41;background:#f3f7fb}*{box-sizing:border-box}body{margin:0}main{max-width:970px;margin:32px auto;padding:0 18px}h1{font-size:29px;margin:0 0 7px}p{line-height:1.65}.muted{color:#64748b}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #e0e8f0;border-radius:15px;padding:20px;margin:16px 0;box-shadow:0 5px 20px #18324b09}label{display:block;font-weight:650;margin:12px 0 6px}select,input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:white}button{background:#1660b6;color:white;border:0;border-radius:9px;padding:13px 24px;font-weight:700;font-size:16px;cursor:pointer;margin-top:17px}button:hover{background:#0e4c95}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:11px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#edf4fc}.pill{display:inline-block;border-radius:6px;background:#e8f1fd;padding:4px 8px;margin:2px;font-size:13px}.score{font-weight:700;color:#1660b6}.small{font-size:13px}.timeline{border-left:3px solid #2c76c6;margin-left:9px;padding-left:20px}.event{margin:15px 0;position:relative}.event:before{content:"";position:absolute;left:-28px;top:5px;background:#2c76c6;width:13px;height:13px;border-radius:50%}@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:23px}} 
+.result-banner{border:2px solid #2d73c3;background:#eaf4ff;border-radius:13px;padding:15px;margin-bottom:15px}
+.result-banner h3{margin:0 0 6px;font-size:18px}.result-banner p{margin:5px 0}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.compare-col{border:1px solid #d6e2f0;border-radius:10px;padding:12px;background:#f8fafc}.compare-col strong{display:block;margin-bottom:9px}
+.step{padding:8px 10px;border-radius:8px;background:white;margin:5px 0;border:1px solid #e2e8f0;font-size:14px}.step.changed{background:#fff0cb;border-color:#e9b44c;font-weight:700}
+.result-updated{animation:glow 1.5s ease-out}@keyframes glow{0%{box-shadow:0 0 0 7px #7bb4fa80}100%{box-shadow:0 5px 20px #18324b09}}
+@media(max-width:700px){.compare{grid-template-columns:1fr 1fr}.compare-col{padding:8px}.step{font-size:12px;padding:7px}}
+</style></head>
+<body><main><h1>Life Rhythm｜5活動 推薦デモ</h1><p class="muted">検証版 v4｜内容ベースで休憩候補を評価し、時間・順番を別途最適化</p>
+<div class="grid"><section class="panel"><h2>ユーザー設定</h2><label for="who">利用者</label><select id="who"><option value="A">A：課題を先に済ませたい</option><option value="B">B：入浴後に課題を進めたい</option></select><label for="start">予定開始時刻</label><select id="start"><option value="17">17:00</option><option value="18" selected>18:00</option><option value="19">19:00</option></select><label for="load">希望する活動の負荷（0～10）</label><input id="load" type="range" min="0" max="10" value="3"><div class="small muted">現在値：<span id="loadValue">3</span></div><label for="recovery">希望する活動の回復度（0～10）</label><input id="recovery" type="range" min="0" max="10" value="7"><div class="small muted">現在値：<span id="recoveryValue">7</span></div><label for="gap">夕食後、入浴までの希望間隔</label><select id="gap"><option value="0">指定しない</option><option value="20" selected>20分以上（試作用の希望）</option><option value="40">40分以上（試作用の希望）</option></select><button id="run">推薦を計算して結果を見る ↓</button><p class="small muted">計算後、結果まで自動移動し、前回との差を表示します。</p></section>
 <section class="panel"><h2>活動データ（仮値）</h2><table><thead><tr><th>ID</th><th>活動</th><th>負荷</th><th>回復</th><th>分</th></tr></thead><tbody id="items"></tbody></table><p class="small muted">既存50活動のIDを維持。睡眠は23:00開始・480分固定。残り4活動の順番を比較します。</p></section></div>
 <section class="panel"><h2>内容ベース推薦：類似度</h2><p class="small muted">希望する負荷・回復の特徴と各活動を比較。類似度は任意活動「休憩」の採用判定に使います。課題・夕食・入浴・睡眠は必須として除外しません。負荷・回復は0～1に正規化しています。</p><div id="similarity"></div></section>
-<section class="panel"><h2>推薦されたスケジュール</h2><p class="muted small" id="explain"></p><div class="timeline" id="schedule"></div><p id="summary" class="score"></p></section>
+<section class="panel" id="results" tabindex="-1"><h2>推薦されたスケジュール</h2><div id="changePanel" aria-live="polite"></div><p class="muted small" id="explain"></p><div class="timeline" id="schedule"></div><p id="summary" class="score"></p></section>
 <section class="panel"><h2>仕組みと限界</h2><p>① 必須の課題・夕食・入浴と、任意の休憩を分ける。② 負荷・回復の類似度と課題による疲労を使い休憩の採用を判定。③ 予定の全順列を比較し、23時就寝・夕食の時間帯・希望した夕食後の間隔を満たす候補だけ残す。④ 時間帯・隣接相性・個人の順序希望・疲労蓄積で比較。⑤ 休憩採用と順番の理由を数値で表示します。</p><p class="small muted">これは学内説明用の試作です。負荷・回復・優先度・相性は採点基準を統一した仮説値であり、実測値ではありません。完了履歴からの自動学習、締切入力、実際の食後間隔の医学的判断は未実装です。食後の待機時間は利用者が指定する試作用の制約で、医学的推奨値ではありません。実行結果は保存しません。</p></section>
 </main><script>
 const items=[
@@ -21,7 +28,7 @@ const prefs={A:[{before:"001",after:"021",score:3},{before:"001",after:"014",sco
 const fmt=m=>String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
 function permutations(a){if(!a.length)return [[]];return a.flatMap((x,i)=>permutations(a.filter((_,j)=>j!==i)).map(p=>[x,...p]));}
 function cosine(a,b){const n=Math.hypot(...a)*Math.hypot(...b);return n?(a[0]*b[0]+a[1]*b[1])/n:0;}
-function band(min){const h=Math.floor(min/60)%24;return h>=5&&h<11?0:h>=11&&h<17?1:2;}
+function band(min){const h=Math.floor(min/60)%24;return h>=5&&h<11?0:h>=11&&h<17?1:h>=17&&h<21?2:3;}
 function chooseRest(desired){const rest=items.find(x=>x.id==="027");const similarity=cosine(desired,[rest.load/10,rest.rec/10]);
  // 明示的なルール。休憩は任意。負荷のある課題の後、回復を求めるなら候補に入れる。
  const needed=items.find(x=>x.id==="001").load>=5 && desired[1]>=0.4 && similarity>=0.7;
@@ -62,13 +69,32 @@ function compute(who,start,desired,gap){
  candidates.sort((a,b)=>b.total-a.total||a.order.map(x=>x.id).join().localeCompare(b.order.map(x=>x.id).join()));
  return {best:candidates[0]||null,candidateCount:candidates.length,rest};
 }
-function calculate(){
+let previousResult=null;
+function displayChanges(current){
+ const panel=document.getElementById("changePanel");
+ const seq=current.order.map(x=>x.name);
+ const prev=previousResult;
+ const changed=!!prev&&(prev.order.join("|")!==seq.join("|")||prev.start!==current.start||prev.gap!==current.gap||prev.rest!==current.rest);
+ const initial=!prev;
+ const explanation=current.who==="A"?"課題を先に進めたいという個人別の順番希望を評価しました。":"入浴後に課題を進めたいという個人別の順番希望を評価しました。";
+ let markup=`<div class="result-banner"><h3>${initial?"初回の推薦結果":changed?"✓ 推薦結果を更新しました":"✓ 再計算しました（前回と同じ結果）"}</h3><p>ユーザー${current.who}：${seq.join(" → ")} → 睡眠</p><p class="small">${explanation}</p></div>`;
+ if(prev){
+  const old=prev.order,newOrder=seq;
+  const col=(title,arr,other)=>`<div class="compare-col"><strong>${title}</strong>${arr.map((x,i)=>`<div class="step ${x!==other[i]?"changed":""}">${i+1}. ${x}</div>`).join("")}</div>`;
+  markup+=`<p class="small muted">黄色は前回から位置や内容が変わった活動です。</p><div class="compare">${col("変更前：ユーザー"+prev.who,old,newOrder)}${col("変更後：ユーザー"+current.who,newOrder,old)}</div>`;
+  if(!changed&&prev.who!==current.who)markup+=`<p class="small muted">ユーザーを切り替えましたが、この条件では同じ順番が選ばれました。</p>`;
+ }
+ panel.innerHTML=markup;
+ previousResult={...current,order:seq};
+}
+function jumpToResults(){const el=document.getElementById("results");el.classList.remove("result-updated");void el.offsetWidth;el.classList.add("result-updated");el.scrollIntoView({behavior:"smooth",block:"start"});}
+function calculate(shouldScroll=false){
  const who=document.getElementById("who").value,start=+document.getElementById("start").value*60,gap=+document.getElementById("gap").value;
  const desired=[+document.getElementById("load").value/10,+document.getElementById("recovery").value/10];
  const sims=items.map(x=>({...x,sim:cosine(desired,[x.load/10,x.rec/10])})).sort((a,b)=>b.sim-a.sim);
  document.getElementById("similarity").innerHTML='<table><thead><tr><th>順位</th><th>活動</th><th>コサイン類似度</th></tr></thead><tbody>'+sims.map((x,i)=>`<tr><td>${i+1}</td><td>${x.name}</td><td>${x.sim.toFixed(3)}</td></tr>`).join("")+'</tbody></table>';
  const result=compute(who,start,desired,gap),best=result.best;
- if(!best){document.getElementById("schedule").textContent="条件を満たす予定がありません。開始時刻または希望間隔を変更してください。";document.getElementById("summary").textContent="";return;}
+ if(!best){document.getElementById("changePanel").innerHTML='<div class="result-banner"><h3>条件を満たす予定がありません</h3><p>開始時刻または希望間隔を変更してください。</p></div>';document.getElementById("schedule").textContent="";document.getElementById("summary").textContent="";if(shouldScroll)jumpToResults();return;}
  const all=[...best.steps];
  if(best.end<1380)all.push({name:"自由時間",start:best.end,end:1380,detail:"予定を割り当てていない時間"});
  all.push({name:"睡眠",start:1380,end:1860,detail:"23:00～翌07:00の固定予定"});
@@ -77,8 +103,10 @@ function calculate(){
  document.getElementById("explain").textContent=`ユーザー${who}・${fmt(start)}開始。休憩は${r.needed?"採用":"今回は不採用"}（類似度${r.similarity.toFixed(3)}、回復希望${(desired[1]*10).toFixed(0)}）。${result.candidateCount}候補を比較。夕食は17～21時、睡眠23時固定。`;
  const b=best.breakdown;
  document.getElementById("summary").innerHTML=`順番：${best.order.map(x=>x.name).join(" → ")} → 睡眠｜合計 ${best.total.toFixed(2)}点<br><span class="small muted">内訳：時間帯 ${b.time} ＋ 隣接相性 ${b.adjacency} ＋ 個人順序 ${b.personal} ＋ 疲労補正 ${b.fatigue}。コサイン類似度は順番得点に足していません。</span>`;
+ displayChanges({who,start,gap,rest:r.needed,order:best.order,total:best.total});
+ if(shouldScroll)jumpToResults();
 }
 document.getElementById("items").innerHTML=items.map(x=>`<tr><td>${x.id}</td><td>${x.name}</td><td>${x.load}</td><td>${x.rec}</td><td>${x.d}</td></tr>`).join("");
 for(const k of ["load","recovery"]){document.getElementById(k).addEventListener("input",e=>document.getElementById(k+"Value").textContent=e.target.value)}
-document.getElementById("run").addEventListener("click",calculate);calculate();
+document.getElementById("run").addEventListener("click",()=>calculate(true));calculate(false);
 </script></body></html>
