@@ -9,18 +9,18 @@
 @media(max-width:700px){.compare{grid-template-columns:1fr 1fr}.compare-col{padding:8px}.step{font-size:12px;padding:7px}}
 </style></head>
 <body><main><h1>Life Rhythm｜5活動 推薦デモ</h1><p class="muted">検証版 v4｜内容ベースで休憩候補を評価し、時間・順番を別途最適化</p>
-<div class="grid"><section class="panel"><h2>ユーザー設定</h2><label for="who">利用者</label><select id="who"><option value="A">A：課題を先に済ませたい</option><option value="B">B：入浴後に課題を進めたい</option></select><label for="start">予定開始時刻</label><select id="start"><option value="17">17:00</option><option value="18" selected>18:00</option><option value="19">19:00</option></select><label for="load">希望する活動の負荷（0～10）</label><input id="load" type="range" min="0" max="10" value="3"><div class="small muted">現在値：<span id="loadValue">3</span></div><label for="recovery">希望する活動の回復度（0～10）</label><input id="recovery" type="range" min="0" max="10" value="7"><div class="small muted">現在値：<span id="recoveryValue">7</span></div><label for="gap">夕食後、入浴までの希望間隔</label><select id="gap"><option value="0">指定しない</option><option value="20" selected>20分以上（試作用の希望）</option><option value="40">40分以上（試作用の希望）</option></select><button id="run">推薦を計算して結果を見る ↓</button><p class="small muted">計算後、結果まで自動移動し、前回との差を表示します。</p></section>
-<section class="panel"><h2>活動データ（仮値）</h2><table><thead><tr><th>ID</th><th>活動</th><th>負荷</th><th>回復</th><th>分</th></tr></thead><tbody id="items"></tbody></table><p class="small muted">既存50活動のIDを維持。睡眠は23:00開始・480分固定。残り4活動の順番を比較します。</p></section></div>
+<div class="grid"><section class="panel"><h2>ユーザー設定</h2><label for="who">利用者</label><select id="who"><option value="A">A：課題を先に済ませたい</option><option value="B">B：入浴後に課題を進めたい</option></select><label for="start">予定開始時刻</label><select id="start"><option value="17">17:00</option><option value="18" selected>18:00</option><option value="19">19:00</option></select><label for="load">希望する活動の負荷（0～10）</label><input id="load" type="range" min="0" max="10" value="3"><div class="small muted">現在値：<span id="loadValue">3</span></div><label for="recovery">希望する活動の回復度（0～10）</label><input id="recovery" type="range" min="0" max="10" value="7"><div class="small muted">現在値：<span id="recoveryValue">7</span></div><label for="gap">夕食後、入浴までの希望間隔</label><select id="gap"><option value="0">指定しない</option><option value="20" selected>20分以上（試作用の希望）</option><option value="40">40分以上（試作用の希望）</option></select><label for="deadline">課題の締切（当日）</label><select id="deadline"><option value="0">締切指定なし</option><option value="19">19:00まで</option><option value="20" selected>20:00まで</option><option value="21">21:00まで</option><option value="22">22:00まで</option></select><label for="fixed">変更できない固定予定</label><select id="fixed"><option value="none">なし</option><option value="bath19">入浴 19:00〜19:25（固定）</option><option value="dinner19">夕食 19:00〜19:30（固定）</option></select><button id="run">推薦を計算して結果を見る ↓</button><p class="small muted">計算後、結果まで自動移動し、前回との差を表示します。</p></section>
+<section class="panel"><h2>活動データ（仮値）</h2><table><thead><tr><th>ID</th><th>活動</th><th>負荷</th><th>回復</th><th>基本優先度</th><th>分</th></tr></thead><tbody id="items"></tbody></table><p class="small muted">既存50活動のIDを維持。睡眠は23:00開始・480分固定。残り4活動の順番を比較します。</p></section></div>
 <section class="panel"><h2>内容ベース推薦：類似度</h2><p class="small muted">希望する負荷・回復の特徴と各活動を比較。類似度は任意活動「休憩」の採用判定に使います。課題・夕食・入浴・睡眠は必須として除外しません。負荷・回復は0～1に正規化しています。</p><div id="similarity"></div></section>
 <section class="panel" id="results" tabindex="-1"><h2>推薦されたスケジュール</h2><div id="changePanel" aria-live="polite"></div><p class="muted small" id="explain"></p><div class="timeline" id="schedule"></div><p id="summary" class="score"></p></section>
-<section class="panel"><h2>仕組みと限界</h2><p>① 必須の課題・夕食・入浴と、任意の休憩を分ける。② 負荷・回復の類似度と課題による疲労を使い休憩の採用を判定。③ 予定の全順列を比較し、23時就寝・夕食の時間帯・希望した夕食後の間隔を満たす候補だけ残す。④ 時間帯・隣接相性・個人の順序希望・疲労蓄積で比較。⑤ 休憩採用と順番の理由を数値で表示します。</p><p class="small muted">これは学内説明用の試作です。負荷・回復・優先度・相性は採点基準を統一した仮説値であり、実測値ではありません。完了履歴からの自動学習、締切入力、実際の食後間隔の医学的判断は未実装です。食後の待機時間は利用者が指定する試作用の制約で、医学的推奨値ではありません。実行結果は保存しません。</p></section>
+<section class="panel"><h2>仕組みと限界</h2><p>① 必須の課題・夕食・入浴と、任意の休憩を分け、基本優先度を保持する。② 負荷・回復の類似度と課題による疲労を使い休憩の採用を判定。③ 予定の全順列を比較し、締切・固定予定・23時就寝・夕食の時間帯・希望した夕食後の間隔を満たす候補だけ残す。④ 時間帯・隣接相性・個人の順序希望・疲労蓄積で比較。⑤ 休憩採用と順番の理由を数値で表示します。</p><p class="small muted">これは学内説明用の試作です。負荷・回復・優先度・相性は採点基準を統一した仮説値であり、実測値ではありません。完了履歴からの自動学習、翌日以降の締切、実際の食後間隔の医学的判断は未実装です。食後の待機時間は利用者が指定する試作用の制約で、医学的推奨値ではありません。基本優先度は活動の採用や必須判定の基準で、全活動を必ず実行する今回の例では順番点に直接足しません。実行結果は保存しません。</p></section>
 </main><script>
 const items=[
-{id:"001",name:"課題",load:5,rec:0,d:60,time:[8,8,6,2]},
-{id:"014",name:"夕食",load:1,rec:2,d:30,time:[0,1,9,4]},
-{id:"021",name:"入浴",load:1,rec:5,d:25,time:[4,4,8,6]},
-{id:"027",name:"休憩",load:0,rec:5,d:15,time:[7,7,7,6]},
-{id:"025",name:"睡眠",load:0,rec:9,d:480,time:[0,0,3,10]}
+{id:"001",priority:7,name:"課題",load:5,rec:0,d:60,time:[8,8,6,2]},
+{id:"014",priority:9,name:"夕食",load:1,rec:2,d:30,time:[0,1,9,4]},
+{id:"021",priority:6,name:"入浴",load:1,rec:5,d:25,time:[4,4,8,6]},
+{id:"027",priority:5,name:"休憩",load:0,rec:5,d:15,time:[7,7,7,6]},
+{id:"025",priority:10,name:"睡眠",load:0,rec:9,d:480,time:[0,0,3,10]}
 ];
 const base={"001>027":4,"027>001":2,"001>021":1,"021>001":0,"014>001":0,"001>014":0,"014>021":0,"021>014":0,"014>027":1,"027>021":0};
 // 順序に関する好みは、隣接していなくても一度だけ評価する。逆向きの減点を重ねない。
@@ -33,23 +33,38 @@ function chooseRest(desired){const rest=items.find(x=>x.id==="027");const simila
  // 明示的なルール。休憩は任意。負荷のある課題の後、回復を求めるなら候補に入れる。
  const needed=items.find(x=>x.id==="001").load>=5 && desired[1]>=0.4 && similarity>=0.7;
  return {needed,similarity};}
-function scoreOrder(order,who,start,gap){
- let t=start, fatigue=0, total=0,steps=[], breakdown={time:0,adjacency:0,personal:0,fatigue:0};
+function scoreOrder(order,who,start,gap,deadline,fixed){
+ let t=start, fatigue=0, total=0,steps=[], breakdown={time:0,adjacency:0,personal:0,fatigue:0,priority:0};
  const mealIndex=order.findIndex(x=>x.id==="014"),bathIndex=order.findIndex(x=>x.id==="021");
  const mealBeforeBath=mealIndex<bathIndex;
  let mealEnd=null,prev=null;
  for(const x of order){
+  const fixedId=fixed==="bath19"?"021":fixed==="dinner19"?"014":null;
+  const fixedStart=1140;
+  if(fixedId&&x.id===fixedId){
+   if(t>fixedStart)return null;
+   if(t<fixedStart){steps.push({name:"自由時間（固定予定まで）",start:t,end:fixedStart,detail:"固定時刻を優先"});t=fixedStart;}
+  }else if(fixedId&&t<fixedStart&&t+x.d>fixedStart){
+   // 固定予定に重なる活動は先に置けない
+   return null;
+  }
   // 夕食の後に入浴する場合、指定した間隔を必須条件として挿入
   if(x.id==="021"&&mealBeforeBath&&mealEnd!==null&&t<mealEnd+gap){
    steps.push({name:"自由時間（待機）",start:t,end:mealEnd+gap,detail:"夕食後の希望間隔"});t=mealEnd+gap;
   }
+  if(fixedId&&x.id===fixedId&&t!==fixedStart)return null;
   if(t+x.d>1380)return null;
   if(x.id==="014"&&(t<1020||t+x.d>1260))return null; // 夕食は17:00～21:00に完了
+  if(x.id==="001"&&deadline&&t+x.d>deadline)return null;
   const ts=x.time[band(t)];
   const adj=prev?(base[prev.id+">"+x.id]||0):0;
   // 蓄積負荷が高いまま次の負荷が加わると減点。回復活動で低下。
   const fPenalty=x.load>0&&fatigue>=4?Math.min(3,fatigue-3):0;
   fatigue=Math.max(0,fatigue+x.load-x.rec);
+  // 基本優先度は全件実行時には定数になるため、順番評価に重複加算しない。
+  // 締切のある課題のみ、余裕を残すほど小さな加点を付ける（最大3点）。
+  const priorityBonus=x.id==="001"&&deadline?Math.min(3,Math.max(0,(deadline-(t+x.d))/60))*x.priority/7:0;
+  breakdown.priority+=priorityBonus;
   breakdown.time+=ts;breakdown.adjacency+=adj;breakdown.fatigue-=fPenalty;
   steps.push({name:x.name,id:x.id,start:t,end:t+x.d,detail:`時間帯 ${ts} / 隣接相性 ${adj} / 疲労ペナルティ -${fPenalty} / 残疲労 ${fatigue}`});
   if(x.id==="014")mealEnd=t+x.d;
@@ -62,10 +77,10 @@ function scoreOrder(order,who,start,gap){
  total=Object.values(breakdown).reduce((a,b)=>a+b,0);
  return {order,steps,total,breakdown,end:t};
 }
-function compute(who,start,desired,gap){
+function compute(who,start,desired,gap,deadline,fixed){
  const rest=chooseRest(desired);
  const selected=items.filter(x=>x.id!=="025"&&(x.id!=="027"||rest.needed));
- const candidates=permutations(selected).map(x=>scoreOrder(x,who,start,gap)).filter(Boolean);
+ const candidates=permutations(selected).map(x=>scoreOrder(x,who,start,gap,deadline,fixed)).filter(Boolean);
  candidates.sort((a,b)=>b.total-a.total||a.order.map(x=>x.id).join().localeCompare(b.order.map(x=>x.id).join()));
  return {best:candidates[0]||null,candidateCount:candidates.length,rest};
 }
@@ -74,7 +89,7 @@ function displayChanges(current){
  const panel=document.getElementById("changePanel");
  const seq=current.order.map(x=>x.name);
  const prev=previousResult;
- const changed=!!prev&&(prev.order.join("|")!==seq.join("|")||prev.start!==current.start||prev.gap!==current.gap||prev.rest!==current.rest);
+ const changed=!!prev&&(prev.order.join("|")!==seq.join("|")||prev.start!==current.start||prev.gap!==current.gap||prev.deadline!==current.deadline||prev.fixed!==current.fixed||prev.rest!==current.rest);
  const initial=!prev;
  const explanation=current.who==="A"?"課題を先に進めたいという個人別の順番希望を評価しました。":"入浴後に課題を進めたいという個人別の順番希望を評価しました。";
  let markup=`<div class="result-banner"><h3>${initial?"初回の推薦結果":changed?"✓ 推薦結果を更新しました":"✓ 再計算しました（前回と同じ結果）"}</h3><p>ユーザー${current.who}：${seq.join(" → ")} → 睡眠</p><p class="small">${explanation}</p></div>`;
@@ -90,23 +105,24 @@ function displayChanges(current){
 function jumpToResults(){const el=document.getElementById("results");el.classList.remove("result-updated");void el.offsetWidth;el.classList.add("result-updated");el.scrollIntoView({behavior:"smooth",block:"start"});}
 function calculate(shouldScroll=false){
  const who=document.getElementById("who").value,start=+document.getElementById("start").value*60,gap=+document.getElementById("gap").value;
+ const deadline=+document.getElementById("deadline").value*60,fixed=document.getElementById("fixed").value;
  const desired=[+document.getElementById("load").value/10,+document.getElementById("recovery").value/10];
  const sims=items.map(x=>({...x,sim:cosine(desired,[x.load/10,x.rec/10])})).sort((a,b)=>b.sim-a.sim);
  document.getElementById("similarity").innerHTML='<table><thead><tr><th>順位</th><th>活動</th><th>コサイン類似度</th></tr></thead><tbody>'+sims.map((x,i)=>`<tr><td>${i+1}</td><td>${x.name}</td><td>${x.sim.toFixed(3)}</td></tr>`).join("")+'</tbody></table>';
- const result=compute(who,start,desired,gap),best=result.best;
+ const result=compute(who,start,desired,gap,deadline,fixed),best=result.best;
  if(!best){document.getElementById("changePanel").innerHTML='<div class="result-banner"><h3>条件を満たす予定がありません</h3><p>開始時刻または希望間隔を変更してください。</p></div>';document.getElementById("schedule").textContent="";document.getElementById("summary").textContent="";if(shouldScroll)jumpToResults();return;}
  const all=[...best.steps];
  if(best.end<1380)all.push({name:"自由時間",start:best.end,end:1380,detail:"予定を割り当てていない時間"});
  all.push({name:"睡眠",start:1380,end:1860,detail:"23:00～翌07:00の固定予定"});
  document.getElementById("schedule").innerHTML=all.map(x=>`<div class="event"><strong>${fmt(x.start)}–${fmt(x.end)}　${x.name}</strong><div class="small muted">${x.detail}</div></div>`).join("");
  const r=result.rest;
- document.getElementById("explain").textContent=`ユーザー${who}・${fmt(start)}開始。休憩は${r.needed?"採用":"今回は不採用"}（類似度${r.similarity.toFixed(3)}、回復希望${(desired[1]*10).toFixed(0)}）。${result.candidateCount}候補を比較。夕食は17～21時、睡眠23時固定。`;
+ document.getElementById("explain").textContent=`ユーザー${who}・${fmt(start)}開始。休憩は${r.needed?"採用":"今回は不採用"}（類似度${r.similarity.toFixed(3)}、回復希望${(desired[1]*10).toFixed(0)}）。${result.candidateCount}候補を比較。夕食は17～21時、睡眠23時固定。課題締切：${deadline?fmt(deadline):"なし"}、固定予定：${fixed==="none"?"なし":fixed==="bath19"?"入浴19時":"夕食19時"}。`;
  const b=best.breakdown;
- document.getElementById("summary").innerHTML=`順番：${best.order.map(x=>x.name).join(" → ")} → 睡眠｜合計 ${best.total.toFixed(2)}点<br><span class="small muted">内訳：時間帯 ${b.time} ＋ 隣接相性 ${b.adjacency} ＋ 個人順序 ${b.personal} ＋ 疲労補正 ${b.fatigue}。コサイン類似度は順番得点に足していません。</span>`;
- displayChanges({who,start,gap,rest:r.needed,order:best.order,total:best.total});
+ document.getElementById("summary").innerHTML=`順番：${best.order.map(x=>x.name).join(" → ")} → 睡眠｜合計 ${best.total.toFixed(2)}点<br><span class="small muted">内訳：時間帯 ${b.time} ＋ 隣接相性 ${b.adjacency} ＋ 個人順序 ${b.personal} ＋ 疲労補正 ${b.fatigue} ＋ 締切余裕 ${b.priority.toFixed(2)}。コサイン類似度は順番得点に足していません。</span>`;
+ displayChanges({who,start,gap,deadline,fixed,rest:r.needed,order:best.order,total:best.total});
  if(shouldScroll)jumpToResults();
 }
-document.getElementById("items").innerHTML=items.map(x=>`<tr><td>${x.id}</td><td>${x.name}</td><td>${x.load}</td><td>${x.rec}</td><td>${x.d}</td></tr>`).join("");
+document.getElementById("items").innerHTML=items.map(x=>`<tr><td>${x.id}</td><td>${x.name}</td><td>${x.load}</td><td>${x.rec}</td><td>${x.priority}</td><td>${x.d}</td></tr>`).join("");
 for(const k of ["load","recovery"]){document.getElementById(k).addEventListener("input",e=>document.getElementById(k+"Value").textContent=e.target.value)}
 document.getElementById("run").addEventListener("click",()=>calculate(true));calculate(false);
 </script></body></html>
